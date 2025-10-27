@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-container class="py-10" max-width="720">
+      <v-container class="py-10" max-width="1100">
         <v-card elevation="8" class="pa-6">
           <v-card-title class="d-flex flex-column align-start pa-0 mb-4">
             <div class="d-flex align-center w-100">
