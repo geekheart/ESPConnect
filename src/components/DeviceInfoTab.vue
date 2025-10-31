@@ -28,67 +28,80 @@
             </div>
           </div>
 
-          <v-row class="device-metrics" dense>
-            <v-col cols="12" sm="4">
-              <v-card class="metric-card" elevation="0" variant="tonal">
-                <v-card-text class="metric-card__body">
-                  <v-icon class="metric-icon" size="22">mdi-memory</v-icon>
-                  <div class="metric-label">Flash Size</div>
-                  <div class="metric-value">{{ details.flashSize || 'Unknown' }}</div>
-                  <div v-if="details.crystal" class="metric-caption">
-                    Crystal {{ details.crystal }}
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-card class="metric-card metric-card--features" elevation="0" variant="tonal">
-                <v-card-text class="metric-card__body">
-                  <v-icon class="metric-icon" size="22">mdi-tune-variant</v-icon>
-                  <div class="metric-label">Feature Set</div>
-                  <div class="metric-value">
-                    {{ details.features?.length ? `${details.features.length} enabled` : 'Not reported' }}
-                  </div>
-                  <div
-                    v-if="details.features?.length"
-                    class="metric-caption"
-                  >
-                    Reported capabilities
-                  </div>
-                  <v-chip-group
-                    v-if="details.features?.length"
-                    column
-                    class="feature-chip-group metric-chip-group"
-                  >
-                    <v-chip
-                      v-for="feature in details.features"
-                      :key="feature"
-                      class="feature-chip"
-                      color="primary"
-                      variant="elevated"
-                      size="small"
-                    >
-                      <v-icon size="16" start>mdi-check-circle</v-icon>
-                      {{ feature }}
-                    </v-chip>
-                  </v-chip-group>
-                  <div v-else class="metric-chip-placeholder">
-                    <v-chip size="small" variant="outlined">Not reported</v-chip>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-card class="metric-card" elevation="0" variant="tonal">
-                <v-card-text class="metric-card__body">
-                  <v-icon class="metric-icon" size="22">mdi-information-slab-circle</v-icon>
-                  <div class="metric-label">Status</div>
-                  <div class="metric-value">Ready</div>
-                  <div class="metric-caption">Device details retrieved</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
+      <v-row class="device-highlights" dense>
+        <v-col cols="12" md="6">
+          <v-card class="highlight-card highlight-card--flash" elevation="0" variant="flat">
+            <v-card-text class="highlight-card__body">
+              <div class="highlight-card__icon">
+                <v-icon size="34">mdi-memory</v-icon>
+              </div>
+              <div class="highlight-card__content">
+                <div class="highlight-card__label">Flash & Clock</div>
+                <div class="highlight-card__value">
+                  {{ details.flashSize || 'Capacity Unknown' }}
+                </div>
+                <div v-if="details.crystal" class="highlight-card__meta">
+                  Crystal {{ details.crystal }}
+                </div>
+              </div>
+            </v-card-text>
+            <v-card-text v-if="primaryFacts.length" class="highlight-card__footer">
+              <div
+                v-for="fact in primaryFacts"
+                :key="fact.label"
+                class="highlight-card__fact"
+              >
+                <v-icon size="18">{{ fact.icon || 'mdi-information-outline' }}</v-icon>
+                <span>{{ fact.value }}</span>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-card class="highlight-card highlight-card--features" elevation="0" variant="flat">
+            <v-card-text class="highlight-card__body">
+              <div class="highlight-card__icon">
+                <v-icon size="34">mdi-lightning-bolt-outline</v-icon>
+              </div>
+              <div class="highlight-card__content">
+                <div class="highlight-card__label">Feature Set</div>
+                <div class="highlight-card__value">
+                  {{ hasFeatures ? `${details.features.length} capabilities` : 'No features reported' }}
+                </div>
+                <div v-if="details.mac" class="highlight-card__meta">
+                  MAC {{ details.mac }}
+                </div>
+              </div>
+            </v-card-text>
+            <v-card-text class="highlight-card__chips">
+              <template v-if="hasFeatures">
+                <v-chip
+                  v-for="feature in featurePreview"
+                  :key="feature"
+                  class="feature-chip"
+                  variant="flat"
+                  size="small"
+                >
+                  <v-icon size="16" start>mdi-check-circle</v-icon>
+                  {{ feature }}
+                </v-chip>
+                <v-chip
+                  v-if="details.features.length > featurePreview.length"
+                  class="feature-chip feature-chip--more"
+                  size="small"
+                  variant="outlined"
+                >
+                  +{{ details.features.length - featurePreview.length }} more
+                </v-chip>
+              </template>
+              <div v-else class="highlight-card__empty">
+                <v-icon size="18">mdi-eye-off-outline</v-icon>
+                <span>Device did not report any optional capabilities.</span>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
 
           <div v-if="details.factGroups?.length" class="detail-groups">
             <div class="section-title mb-3">
@@ -159,6 +172,51 @@ const hasDistinctDescription = computed(() => {
   if (!details.value) return false;
   const { name, description } = details.value;
   return Boolean(description) && description !== name;
+});
+
+const primaryFacts = computed(() => {
+  const facts = Array.isArray(details.value?.facts) ? details.value.facts : [];
+  if (!facts.length) return [];
+  const preferredOrder = [
+    'Embedded Flash',
+    'Embedded PSRAM',
+    'Flash Device',
+    'Connection Baud',
+    'USB Bridge',
+  ];
+  const selected = [];
+  const seen = new Set();
+
+  for (const label of preferredOrder) {
+    const match = facts.find(fact => fact.label === label && fact.value);
+    if (match && !seen.has(match.label)) {
+      selected.push(match);
+      seen.add(match.label);
+    }
+    if (selected.length >= 3) break;
+  }
+
+  if (selected.length < 3) {
+    for (const fact of facts) {
+      if (fact?.value && !seen.has(fact.label)) {
+        selected.push(fact);
+        seen.add(fact.label);
+        if (selected.length >= 3) break;
+      }
+    }
+  }
+
+  return selected;
+});
+
+const hasFeatures = computed(
+  () => Array.isArray(details.value?.features) && details.value.features.length > 0
+);
+
+const featurePreview = computed(() => {
+  if (!hasFeatures.value) return [];
+  const limit = 6;
+  return details.value.features.slice(0, limit);
 });
 
 </script>
@@ -237,55 +295,127 @@ const hasDistinctDescription = computed(() => {
   opacity: 0.95;
 }
 
-.device-metrics {
-  margin-bottom: 24px;
+.device-highlights {
+  margin-bottom: clamp(18px, 3vw, 32px);
 }
 
-.metric-card {
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--v-theme-surface) 88%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--v-theme-on-surface) 12%, transparent);
+.highlight-card {
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--v-theme-primary) 16%, transparent);
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--v-theme-surface) 92%, transparent) 0%,
+    color-mix(in srgb, var(--v-theme-primary) 12%, transparent) 100%
+  );
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
 }
 
-.metric-card__body {
+.highlight-card--flash {
+  background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--v-theme-primary) 22%, transparent) 0%,
+      color-mix(in srgb, var(--v-theme-surface) 96%, transparent) 100%
+    ),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.highlight-card--features {
+  background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--v-theme-secondary) 24%, transparent) 0%,
+      color-mix(in srgb, var(--v-theme-surface) 96%, transparent) 100%
+    ),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.04), transparent);
+}
+
+.highlight-card__body {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: clamp(20px, 4vw, 32px);
+  min-height: 160px;
+}
+
+.highlight-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--v-theme-primary) 42%, transparent);
+  color: color-mix(in srgb, var(--v-theme-on-primary) 95%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v-theme-on-primary) 18%, transparent);
+}
+
+.highlight-card--features .highlight-card__icon {
+  background: color-mix(in srgb, var(--v-theme-secondary) 46%, transparent);
+  color: color-mix(in srgb, var(--v-theme-on-secondary) 94%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v-theme-on-secondary) 20%, transparent);
+}
+
+.highlight-card__content {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 140px;
-  padding: 16px;
+  color: color-mix(in srgb, var(--v-theme-on-surface) 96%, transparent);
 }
 
-.metric-icon {
-  color: color-mix(in srgb, var(--v-theme-primary) 80%, transparent);
-}
-
-.metric-label {
-  font-size: 0.85rem;
+.highlight-card__label {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 60%, transparent);
-}
-
-.metric-value {
-  font-size: 1.1rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
   font-weight: 600;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 94%, transparent);
+  opacity: 0.82;
 }
 
-.metric-caption {
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 55%, transparent);
+.highlight-card__value {
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
-.metric-card--features .metric-card__body {
-  gap: 10px;
+.highlight-card__meta {
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
-.metric-chip-group {
+.highlight-card__footer,
+.highlight-card__chips {
   display: flex;
   flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 clamp(20px, 4vw, 28px) clamp(18px, 3vw, 26px);
+}
+
+.highlight-card__fact {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--v-theme-primary) 26%, transparent);
+  color: color-mix(in srgb, var(--v-theme-on-primary) 94%, transparent);
+  font-size: 0.87rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v-theme-on-primary) 18%, transparent);
+}
+
+.highlight-card--features .highlight-card__chips {
+  background: color-mix(in srgb, var(--v-theme-secondary) 18%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--v-theme-on-secondary) 14%, transparent);
+}
+
+.highlight-card__empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--v-theme-on-secondary) 85%, transparent);
+  opacity: 0.92;
 }
 
 .section-title {
@@ -307,20 +437,22 @@ const hasDistinctDescription = computed(() => {
 
 .feature-chip {
   border-radius: 999px;
-  background: color-mix(in srgb, var(--v-theme-primary) 16%, var(--v-theme-surface) 88%) !important;
-  color: color-mix(in srgb, var(--v-theme-primary) 75%, var(--v-theme-on-surface) 35%) !important;
+  background: color-mix(in srgb, var(--v-theme-on-secondary) 12%, transparent) !important;
+  color: color-mix(in srgb, var(--v-theme-on-secondary) 96%, transparent) !important;
   font-weight: 600;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v-theme-on-secondary) 22%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.feature-chip--more {
+  background: transparent !important;
+  color: color-mix(in srgb, var(--v-theme-on-secondary) 82%, transparent) !important;
+  border-color: color-mix(in srgb, var(--v-theme-on-secondary) 40%, transparent) !important;
 }
 
 .feature-chip :deep(.v-icon) {
   color: inherit;
   opacity: 0.9;
-}
-
-.metric-chip-placeholder {
-  margin-top: 4px;
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 55%, transparent);
 }
 
 .detail-groups {
@@ -332,55 +464,69 @@ const hasDistinctDescription = computed(() => {
 }
 
 .detail-card {
-  border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--v-theme-on-surface) 10%, transparent);
-  background: color-mix(in srgb, var(--v-theme-surface) 96%, transparent);
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--v-theme-primary) 12%, transparent);
+  background: linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--v-theme-surface) 98%, transparent) 0%,
+      color-mix(in srgb, var(--v-theme-primary) 10%, transparent) 100%
+    ),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.04), transparent);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .detail-card__title {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 82%, transparent);
-  padding: 18px 22px 12px;
+  font-size: 1rem;
+  font-weight: 650;
+  color: color-mix(in srgb, var(--v-theme-on-surface) 94%, transparent);
+  padding: 20px 24px 14px;
+  letter-spacing: 0.015em;
 }
 
 .detail-card__divider {
-  margin: 0 18px;
+  margin: 0 22px;
+  opacity: 0.35;
 }
 
 .detail-card__body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 16px 22px 22px;
+  gap: 12px;
+  padding: 18px 24px 24px;
 }
 
 .detail-card__item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
 .detail-card__item-label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 65%, transparent);
-  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--v-theme-on-surface) 80%, transparent);
+  font-size: 0.87rem;
   letter-spacing: 0.01em;
 }
 
 .detail-card__item-value {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--v-theme-on-surface) 92%, transparent);
+  font-weight: 650;
+  font-size: 0.92rem;
+  color: color-mix(in srgb, var(--v-theme-on-surface) 98%, transparent);
   text-align: right;
   word-break: break-word;
 }
@@ -393,7 +539,7 @@ const hasDistinctDescription = computed(() => {
 
 @media (max-width: 599px) {
   .detail-card__item {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     align-items: flex-start;
   }
 
