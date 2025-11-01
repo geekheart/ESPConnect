@@ -235,6 +235,45 @@
           </v-window>
         </v-card>
 
+        <v-dialog
+          :model-value="confirmationDialog.visible"
+          max-width="420"
+          @update:model-value="value => {
+            if (!value) resolveConfirmation(false);
+          }"
+        >
+          <v-card>
+            <v-card-title class="text-h6">
+              <v-icon
+                start
+                :color="confirmationDialog.destructive ? 'error' : 'warning'"
+              >mdi-alert-circle-outline</v-icon>
+              {{ confirmationDialog.title || 'Please confirm' }}
+            </v-card-title>
+            <v-card-text class="text-body-2">
+              <div class="confirmation-message">
+                {{ confirmationDialog.message }}
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                variant="text"
+                @click="resolveConfirmation(false)"
+              >
+                {{ confirmationDialog.cancelText || 'Cancel' }}
+              </v-btn>
+              <v-btn
+                :color="confirmationDialog.destructive ? 'error' : 'primary'"
+                variant="tonal"
+                @click="resolveConfirmation(true)"
+              >
+                {{ confirmationDialog.confirmText || 'Continue' }}
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <v-dialog v-model="showBootDialog" width="420">
           <v-card>
             <v-card-title class="text-h6">
@@ -753,6 +792,15 @@ const MONITOR_BUFFER_LIMIT = 20000;
 let monitorPendingText = '';
 let monitorFlushHandle = null;
 let monitorFlushUsingAnimationFrame = false;
+const confirmationDialog = reactive({
+  visible: false,
+  title: '',
+  message: '',
+  confirmText: 'Confirm',
+  cancelText: 'Cancel',
+  destructive: false,
+});
+let confirmationResolver = null;
 const currentPort = ref(null);
 const transport = ref(null);
 const loader = ref(null);
@@ -883,6 +931,34 @@ function applyRegisterGuide(chipKey) {
       link: entry.url || guide.reference?.url || null,
     };
   });
+}
+
+function showConfirmation(options = {}) {
+  return new Promise(resolve => {
+    confirmationResolver = resolve;
+    confirmationDialog.title = options.title || 'Please confirm';
+    confirmationDialog.message = options.message || '';
+    confirmationDialog.confirmText = options.confirmText || 'Confirm';
+    confirmationDialog.cancelText = options.cancelText || 'Cancel';
+    confirmationDialog.destructive = !!options.destructive;
+    confirmationDialog.visible = true;
+  });
+}
+
+function resolveConfirmation(result) {
+  if (!confirmationDialog.visible) {
+    if (confirmationResolver) {
+      confirmationResolver(result);
+      confirmationResolver = null;
+    }
+    return;
+  }
+  confirmationDialog.visible = false;
+  const resolver = confirmationResolver;
+  confirmationResolver = null;
+  if (resolver) {
+    resolver(result);
+  }
 }
 
 const partitionColorOverrides = {
@@ -1942,13 +2018,15 @@ async function flashFirmware() {
   }
 
   const firmwareLabel = firmwareName.value || 'selected firmware';
-  const confirmationMessage =
-    `Flash ${firmwareLabel} at 0x${offsetNumber.toString(16).toUpperCase()}? ` +
-    'This will overwrite the target region and may erase existing data.';
-  const confirmFlash =
-    typeof window !== 'undefined' && typeof window.confirm === 'function'
-      ? window.confirm(confirmationMessage)
-      : true;
+  const confirmFlash = await showConfirmation({
+    title: 'Confirm Flash',
+    message:
+      `Flash ${firmwareLabel} at 0x${offsetNumber.toString(16).toUpperCase()}?\n` +
+      'This will overwrite the target region and may erase existing data.',
+    confirmText: 'Flash',
+    cancelText: 'Cancel',
+    destructive: true,
+  });
   if (!confirmFlash) {
     appendLog('Firmware flash cancelled by user.', '[warn]');
     return;
@@ -2482,12 +2560,13 @@ async function handleEraseFlash(payload = { mode: 'full' }) {
     return;
   }
 
-  const confirmErase =
-    typeof window !== 'undefined' && typeof window.confirm === 'function'
-      ? window.confirm(
-          'Erase entire flash? This action removes all data from the device and cannot be undone.'
-        )
-      : true;
+  const confirmErase = await showConfirmation({
+    title: 'Erase Entire Flash',
+    message: 'Erase the entire flash? This removes all data and cannot be undone.',
+    confirmText: 'Erase Flash',
+    cancelText: 'Cancel',
+    destructive: true,
+  });
   if (!confirmErase) {
     flashReadStatusType.value = 'info';
     flashReadStatus.value = 'Flash erase cancelled.';
@@ -2571,6 +2650,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: 12px;
 }
 
 .status-link {
@@ -2615,6 +2695,10 @@ onBeforeUnmount(() => {
 
 .status-bar .v-divider {
   height: 36px;
+}
+
+.confirmation-message {
+  white-space: pre-line;
 }
 
 </style>
