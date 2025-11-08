@@ -276,7 +276,15 @@
               <v-alert v-else-if="spiffsViewerDialog.error" type="error" variant="tonal" border="start" class="mb-4">
                 {{ spiffsViewerDialog.error }}
               </v-alert>
-              <pre v-else class="spiffs-viewer__content">{{ spiffsViewerDialog.content }}</pre>
+              <template v-else>
+                <img
+                  v-if="spiffsViewerDialog.mode === 'image' && spiffsViewerDialog.imageUrl"
+                  :src="spiffsViewerDialog.imageUrl"
+                  class="spiffs-viewer__image"
+                  :alt="spiffsViewerDialog.name"
+                />
+                <pre v-else class="spiffs-viewer__content">{{ spiffsViewerDialog.content }}</pre>
+              </template>
             </v-card-text>
             <v-card-actions>
               <v-spacer />
@@ -325,7 +333,7 @@ const DEFAULT_ROM_BAUD = 115200;
 const DEFAULT_FLASH_BAUD = 921600;
 const MONITOR_BAUD = 115200;
 const DEBUG_SERIAL = false;
-const VIEWABLE_SPIFFS_EXTENSIONS = [
+const SPIFFS_TEXT_EXTENSIONS = [
   'txt',
   'log',
   'json',
@@ -343,7 +351,17 @@ const VIEWABLE_SPIFFS_EXTENSIONS = [
   'yaml',
   'yml',
 ];
-const SPIFFS_VIEWER_MAX_BYTES = 128 * 1024; // 128 KB previews
+const SPIFFS_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg'];
+const SPIFFS_IMAGE_MIME_MAP = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  bmp: 'image/bmp',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+};
+const SPIFFS_VIEWER_MAX_BYTES = 512 * 1024; // 512 KB previews
 const SPIFFS_VIEWER_DECODER = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true });
 
 const PACKAGE_LABELS = {
@@ -741,6 +759,20 @@ function updateSpiffsUsage() {
   }
 }
 
+function resolveSpiffsViewInfo(name = '') {
+  if (!name) return null;
+  const dotIndex = name.lastIndexOf('.');
+  if (dotIndex === -1) return null;
+  const ext = name.slice(dotIndex + 1).toLowerCase();
+  if (SPIFFS_TEXT_EXTENSIONS.includes(ext)) {
+    return { mode: 'text', ext };
+  }
+  if (SPIFFS_IMAGE_EXTENSIONS.includes(ext)) {
+    return { mode: 'image', ext, mime: SPIFFS_IMAGE_MIME_MAP[ext] || 'image/*' };
+  }
+  return null;
+}
+
 async function ensureSpiffsReady(options = {}) {
   if (!connected.value || !spiffsAvailable.value) {
     return;
@@ -969,28 +1001,26 @@ async function handleSpiffsDownloadFile(name) {
 }
 
 function isViewableSpiffsFile(name = '') {
-  if (!name) {
-    return false;
-  }
-  const dotIndex = name.lastIndexOf('.');
-  if (dotIndex === -1) {
-    return false;
-  }
-  const ext = name.slice(dotIndex + 1).toLowerCase();
-  return VIEWABLE_SPIFFS_EXTENSIONS.includes(ext);
+  return Boolean(resolveSpiffsViewInfo(name));
 }
 
 async function handleSpiffsView(name) {
   if (!spiffsState.client) return;
-  if (!isViewableSpiffsFile(name)) {
+  const viewInfo = resolveSpiffsViewInfo(name);
+  if (!viewInfo) {
     spiffsState.status = 'This file type cannot be previewed. Download it instead.';
     return;
+  }
+  if (spiffsViewerDialog.imageUrl) {
+    URL.revokeObjectURL(spiffsViewerDialog.imageUrl);
   }
   spiffsViewerDialog.visible = true;
   spiffsViewerDialog.name = name;
   spiffsViewerDialog.loading = true;
   spiffsViewerDialog.error = null;
   spiffsViewerDialog.content = '';
+  spiffsViewerDialog.imageUrl = '';
+  spiffsViewerDialog.mode = viewInfo.mode;
   try {
     const data = await spiffsState.client.read(name);
     if (data.length > SPIFFS_VIEWER_MAX_BYTES) {
@@ -998,7 +1028,12 @@ async function handleSpiffsView(name) {
         `File too large to preview (limit ${formatBytes(SPIFFS_VIEWER_MAX_BYTES) ?? SPIFFS_VIEWER_MAX_BYTES} bytes).`,
       );
     }
-    spiffsViewerDialog.content = SPIFFS_VIEWER_DECODER.decode(data);
+    if (viewInfo.mode === 'image') {
+      const blob = new Blob([data], { type: viewInfo.mime || 'image/*' });
+      spiffsViewerDialog.imageUrl = URL.createObjectURL(blob);
+    } else {
+      spiffsViewerDialog.content = SPIFFS_VIEWER_DECODER.decode(data);
+    }
   } catch (error) {
     spiffsViewerDialog.error = formatErrorMessage(error);
   } finally {
@@ -1007,11 +1042,16 @@ async function handleSpiffsView(name) {
 }
 
 function closeSpiffsViewer() {
+  if (spiffsViewerDialog.imageUrl) {
+    URL.revokeObjectURL(spiffsViewerDialog.imageUrl);
+  }
   spiffsViewerDialog.visible = false;
   spiffsViewerDialog.name = '';
   spiffsViewerDialog.content = '';
   spiffsViewerDialog.error = null;
   spiffsViewerDialog.loading = false;
+  spiffsViewerDialog.mode = null;
+  spiffsViewerDialog.imageUrl = '';
 }
 
 function cancelSpiffsBackup() {
@@ -1393,6 +1433,8 @@ const spiffsViewerDialog = reactive({
   content: '',
   error: null,
   loading: false,
+  mode: null,
+  imageUrl: '',
 });
 const spiffsPartitions = computed(() =>
   partitionTable.value
@@ -4084,5 +4126,14 @@ onBeforeUnmount(() => {
   font-size: 0.9rem;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.spiffs-viewer__image {
+  max-width: 100%;
+  max-height: 60vh;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 </style>
