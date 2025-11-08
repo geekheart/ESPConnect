@@ -86,6 +86,7 @@
                 :usage="spiffsState.usage" :upload-blocked="spiffsState.uploadBlocked"
                 :upload-blocked-reason="spiffsState.uploadBlockedReason"
                 :is-file-viewable="isViewableSpiffsFile"
+                :get-file-preview-info="resolveSpiffsViewInfo"
                 @select-partition="handleSelectSpiffsPartition" @refresh="handleRefreshSpiffs"
                 @backup="handleSpiffsBackup" @restore="handleSpiffsRestore" @download-file="handleSpiffsDownloadFile"
                 @view-file="handleSpiffsView" @validate-upload="handleSpiffsUploadSelection"
@@ -286,6 +287,15 @@
                   class="spiffs-viewer__image"
                   :alt="spiffsViewerDialog.name"
                 />
+                <audio
+                  v-else-if="spiffsViewerDialog.mode === 'audio' && spiffsViewerDialog.audioUrl"
+                  :src="spiffsViewerDialog.audioUrl"
+                  class="spiffs-viewer__audio"
+                  controls
+                  preload="auto"
+                >
+                  Your browser does not support audio playback.
+                </audio>
                 <pre v-else class="spiffs-viewer__content">{{ spiffsViewerDialog.content }}</pre>
               </template>
             </v-card-text>
@@ -382,6 +392,19 @@ const SPIFFS_IMAGE_MIME_MAP = {
   bmp: 'image/bmp',
   webp: 'image/webp',
   svg: 'image/svg+xml',
+};
+const SPIFFS_AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'oga', 'opus', 'm4a', 'aac', 'flac', 'weba', 'webm'];
+const SPIFFS_AUDIO_MIME_MAP = {
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+  ogg: 'audio/ogg',
+  oga: 'audio/ogg',
+  opus: 'audio/ogg; codecs=opus',
+  m4a: 'audio/mp4',
+  aac: 'audio/aac',
+  flac: 'audio/flac',
+  weba: 'audio/webm',
+  webm: 'audio/webm',
 };
 const SPIFFS_VIEWER_MAX_BYTES = 2 * 1024 * 1024; // 2 MB previews
 const SPIFFS_VIEWER_DECODER = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true });
@@ -797,6 +820,9 @@ function resolveSpiffsViewInfo(name = '') {
   if (SPIFFS_IMAGE_EXTENSIONS.includes(ext)) {
     return { mode: 'image', ext, mime: SPIFFS_IMAGE_MIME_MAP[ext] || 'image/*' };
   }
+  if (SPIFFS_AUDIO_EXTENSIONS.includes(ext)) {
+    return { mode: 'audio', ext, mime: SPIFFS_AUDIO_MIME_MAP[ext] || 'audio/*' };
+  }
   return null;
 }
 
@@ -1075,12 +1101,16 @@ async function handleSpiffsView(name) {
   if (spiffsViewerDialog.imageUrl) {
     URL.revokeObjectURL(spiffsViewerDialog.imageUrl);
   }
+  if (spiffsViewerDialog.audioUrl) {
+    URL.revokeObjectURL(spiffsViewerDialog.audioUrl);
+  }
   spiffsViewerDialog.visible = true;
   spiffsViewerDialog.name = name;
   spiffsViewerDialog.loading = true;
   spiffsViewerDialog.error = null;
   spiffsViewerDialog.content = '';
   spiffsViewerDialog.imageUrl = '';
+  spiffsViewerDialog.audioUrl = '';
   spiffsViewerDialog.mode = viewInfo.mode;
   try {
     const data = await spiffsState.client.read(name);
@@ -1092,6 +1122,9 @@ async function handleSpiffsView(name) {
     if (viewInfo.mode === 'image') {
       const blob = new Blob([data], { type: viewInfo.mime || 'image/*' });
       spiffsViewerDialog.imageUrl = URL.createObjectURL(blob);
+    } else if (viewInfo.mode === 'audio') {
+      const blob = new Blob([data], { type: viewInfo.mime || 'audio/*' });
+      spiffsViewerDialog.audioUrl = URL.createObjectURL(blob);
     } else {
       spiffsViewerDialog.content = SPIFFS_VIEWER_DECODER.decode(data);
     }
@@ -1106,6 +1139,9 @@ function closeSpiffsViewer() {
   if (spiffsViewerDialog.imageUrl) {
     URL.revokeObjectURL(spiffsViewerDialog.imageUrl);
   }
+  if (spiffsViewerDialog.audioUrl) {
+    URL.revokeObjectURL(spiffsViewerDialog.audioUrl);
+  }
   spiffsViewerDialog.visible = false;
   spiffsViewerDialog.name = '';
   spiffsViewerDialog.content = '';
@@ -1113,6 +1149,7 @@ function closeSpiffsViewer() {
   spiffsViewerDialog.loading = false;
   spiffsViewerDialog.mode = null;
   spiffsViewerDialog.imageUrl = '';
+  spiffsViewerDialog.audioUrl = '';
 }
 
 function cancelSpiffsBackup() {
@@ -1519,6 +1556,7 @@ const spiffsViewerDialog = reactive({
   loading: false,
   mode: null,
   imageUrl: '',
+  audioUrl: '',
 });
 const spiffsUploadErrorDialog = reactive({
   visible: false,
@@ -4231,5 +4269,14 @@ onBeforeUnmount(() => {
   margin: 0 auto;
   border-radius: 8px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.spiffs-viewer__audio {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--v-theme-surface) 60%, transparent);
 }
 </style>

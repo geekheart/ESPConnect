@@ -194,8 +194,8 @@
                 :disabled="loading || busy || saving || readOnly"
                 @click="emit('view-file', file.name)"
               >
-                <v-icon start size="16">mdi-eye</v-icon>
-                View
+                <v-icon start size="16">{{ previewIcon(file.name) }}</v-icon>
+                {{ previewLabel(file.name) }}
               </v-btn>
               <v-btn
                 size="small"
@@ -290,6 +290,10 @@ const props = defineProps({
   isFileViewable: {
     type: Function,
     default: () => false,
+  },
+  getFilePreviewInfo: {
+    type: Function,
+    default: null,
   },
 });
 
@@ -408,11 +412,56 @@ function formatSize(size) {
   return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-function isViewable(name) {
-  if (typeof props.isFileViewable !== 'function') {
-    return false;
+function toPreviewInfo(value) {
+  if (!value) {
+    return null;
   }
-  return Boolean(props.isFileViewable(name));
+  if (typeof value === 'string') {
+    return { mode: value };
+  }
+  if (value === true) {
+    return { mode: 'text' };
+  }
+  if (typeof value === 'object' && value.mode) {
+    return value;
+  }
+  return null;
+}
+
+function getPreviewInfo(name) {
+  if (!name) {
+    return null;
+  }
+  if (typeof props.getFilePreviewInfo === 'function') {
+    const info = toPreviewInfo(props.getFilePreviewInfo(name));
+    if (info) {
+      return info;
+    }
+  }
+  if (typeof props.isFileViewable === 'function') {
+    return toPreviewInfo(props.isFileViewable(name));
+  }
+  return null;
+}
+
+function isViewable(name) {
+  return Boolean(getPreviewInfo(name));
+}
+
+function previewIcon(name) {
+  const info = getPreviewInfo(name);
+  if (info?.mode === 'audio') {
+    return 'mdi-headphones';
+  }
+  return 'mdi-eye';
+}
+
+function previewLabel(name) {
+  const info = getPreviewInfo(name);
+  if (info?.mode === 'audio') {
+    return 'Listen';
+  }
+  return 'View';
 }
 </script>
 
