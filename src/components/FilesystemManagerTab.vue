@@ -381,6 +381,7 @@ const emit = defineEmits([
 ]);
 
 const uploadFile = ref(null);
+const dropQueue = ref([]);
 const restoreInput = ref(null);
 const fileSearch = ref('');
 const filesPerPage = ref(10);
@@ -484,7 +485,19 @@ watch(
   () => props.uploadBlocked,
   blocked => {
     if (blocked) {
+      dropQueue.value = [];
       autoUploadPending.value = false;
+    } else {
+      scheduleNextDropUpload();
+    }
+  },
+);
+
+watch(
+  () => canUpload.value,
+  value => {
+    if (value) {
+      scheduleNextDropUpload();
     }
   },
 );
@@ -508,6 +521,7 @@ function submitUpload(auto = false) {
   emit('upload-file', { file: uploadFile.value });
   uploadFile.value = null;
   autoUploadPending.value = false;
+  scheduleNextDropUpload();
 }
 
 function triggerRestore() {
@@ -542,10 +556,22 @@ function handleDragLeave(event) {
 function handleDrop(event) {
   dragActive.value = false;
   if (!canUpload.value) return;
-  const file = event.dataTransfer?.files?.[0];
-  if (!file) return;
+  const files = Array.from(event.dataTransfer?.files ?? []).filter(file => file instanceof File);
+  if (!files.length) return;
+  dropQueue.value.push(...files);
+  scheduleNextDropUpload();
+}
+
+function scheduleNextDropUpload() {
+  if (uploadFile.value || props.uploadBlocked || !canUpload.value) {
+    return;
+  }
+  const next = dropQueue.value.shift();
+  if (!next) {
+    return;
+  }
+  uploadFile.value = next;
   autoUploadPending.value = true;
-  uploadFile.value = file;
 }
 
 function formatSize(size) {
