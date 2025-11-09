@@ -187,6 +187,10 @@
             <v-window-item value="log">
               <SessionLogTab :log-text="logText" @clear-log="clearLog" />
             </v-window-item>
+
+            <v-window-item value="about">
+              <AboutTab />
+            </v-window-item>
           </v-window>
         </v-card>
 
@@ -538,6 +542,7 @@ import DeviceInfoTab from './components/DeviceInfoTab.vue';
 import FlashFirmwareTab from './components/FlashFirmwareTab.vue';
 import AppsTab from './components/AppsTab.vue';
 import FilesystemManagerTab from './components/FilesystemManagerTab.vue';
+import AboutTab from './components/AboutTab.vue';
 import PartitionsTab from './components/PartitionsTab.vue';
 import SessionLogTab from './components/SessionLogTab.vue';
 import SerialMonitorTab from './components/SerialMonitorTab.vue';
@@ -3207,6 +3212,12 @@ const navigationItems = computed(() => [
   { title: 'Firmware Tools', value: 'flash', icon: 'mdi-chip', disabled: false },
   { title: 'Serial Monitor', value: 'console', icon: 'mdi-console-line', disabled: false },
   { title: 'Session Log', value: 'log', icon: 'mdi-clipboard-text-outline', disabled: false },
+  {
+    title: 'About',
+    value: 'about',
+    icon: 'mdi-information-box-outline',
+    disabled: false,
+  },
 ]);
 
 const resourceLinks = [
