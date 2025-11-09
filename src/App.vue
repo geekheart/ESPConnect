@@ -511,25 +511,6 @@
           </v-card>
         </v-dialog>
 
-        <v-dialog :model-value="uploadErrorDialog.visible" max-width="480"
-          @update:model-value="value => { if (!value) uploadErrorDialog.visible = false; }">
-          <v-card>
-            <v-card-title class="text-h6">
-              <v-icon start color="error">mdi-alert-circle</v-icon>
-              File too large
-            </v-card-title>
-            <v-card-text class="text-body-2">
-              {{ uploadErrorDialog.message || 'Not enough filesystem space to store this file.' }}
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer />
-              <v-btn color="primary" variant="text" @click="uploadErrorDialog.visible = false">
-                Close
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
         <v-snackbar v-model="toast.visible" :timeout="toast.timeout" :color="toast.color" location="bottom right">
           {{ toast.message }}
         </v-snackbar>
@@ -2111,8 +2092,6 @@ function resetSpiffsState() {
     freeBytes: 0,
   };
   closeSpiffsViewer();
-  uploadErrorDialog.visible = false;
-  uploadErrorDialog.message = '';
   spiffsState.uploadBlocked = false;
   spiffsState.uploadBlockedReason = '';
 }
@@ -2525,9 +2504,7 @@ function resetViewerMedia() {
 }
 
 function showUploadError(message) {
-  uploadErrorDialog.message = message || 'Not enough filesystem space to store this file.';
-  uploadErrorDialog.visible = true;
-  showToast(uploadErrorDialog.message, { color: 'error', timeout: 6000 });
+  showToast(message || 'Not enough filesystem space to store this file.', { color: 'error', timeout: 6000 });
 }
 
 function showToast(message, options = {}) {
@@ -3019,10 +2996,6 @@ const spiffsViewerDialog = reactive({
   imageUrl: '',
   audioUrl: '',
   source: 'spiffs',
-});
-const uploadErrorDialog = reactive({
-  visible: false,
-  message: '',
 });
 const toast = reactive({
   visible: false,
