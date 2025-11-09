@@ -101,9 +101,6 @@
           </v-row>
         </div>
         <v-divider :thickness="2" class="mt-3"></v-divider>
-        <v-alert v-if="!files.length" type="info" variant="tonal" density="comfortable" border="start" class="mt-4">
-          {{ emptyMessage }}
-        </v-alert>
         <div v-if="files.length" class="filesystem-table__toolbar mt-4">
           <v-text-field v-model="fileSearch" label="Filter files" variant="outlined" density="comfortable" clearable
             hide-details prepend-inner-icon="mdi-magnify"
@@ -135,14 +132,16 @@
                 :title="`Download ${unwrapItem(item).name}`" :aria-label="`Download ${unwrapItem(item).name}`"
                 @click="emit('download-file', unwrapItem(item).name)" />
               <v-icon size="small" variant="text" color="error" :disabled="readOnly || loading || busy || saving"
-                icon="mdi-delete" :title="`Delete ${unwrapItem(item).name}`" :aria-label="`Delete ${unwrapItem(item).name}`"
-                @click="emit('delete-file', unwrapItem(item).name)" />
+                icon="mdi-delete" :title="`Delete ${unwrapItem(item).name}`"
+                :aria-label="`Delete ${unwrapItem(item).name}`" @click="emit('delete-file', unwrapItem(item).name)" />
             </div>
           </template>
           <template #no-data>
-            <div class="filesystem-table__empty">
-              <div v-if="files.length">No files match the current filters.</div>
-              <div v-else>{{ emptyMessage }}</div>
+            <div v-if="files.length">
+              <v-alert type="warning" variant="tonal" border="start"> No files match the current filter</v-alert>
+            </div>
+            <div v-else>
+              <v-alert type="info" variant="tonal" border="start"> {{ emptyMessage }}</v-alert>
             </div>
           </template>
         </v-data-table>
