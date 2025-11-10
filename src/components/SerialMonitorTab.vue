@@ -66,6 +66,14 @@
         Console run at 115200 bps automatically for reliable output. Flashing uses the baud
         rate selected in the toolbar.
       </v-card-subtitle>
+      <v-alert
+        type="info"
+        variant="tonal"
+        class="monitor-card__info"
+        icon="mdi-information-outline"
+      >
+        Starting the serial monitor closes the bootloader connection, resets the board into normal firmware mode, and releases the USB port so the browser stops access once you exit. Reconnect with the main <strong>Connect</strong> button before running maintenance (flash, partition tools, etc.).
+      </v-alert>
       <v-divider />
       <v-card-text ref="terminalEl" class="monitor-terminal">
         <pre class="monitor-terminal__output">
@@ -223,6 +231,12 @@ onMounted(() => {
 .monitor-card__subtitle {
   font-size: 0.75rem;
   padding: 0 24px 4px;
+}
+
+.monitor-card__info {
+  margin: 0 24px 12px;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .monitor-terminal {
