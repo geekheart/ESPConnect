@@ -63,6 +63,19 @@
         </p>
       </v-card-text>
     </v-card>
+
+    <v-card variant="tonal">
+      <v-card-title class="text-subtitle-1">
+        <v-icon start color="primary">mdi-lock-check</v-icon>
+        Privacy &amp; Security
+      </v-card-title>
+      <v-card-text class="text-body-2">
+        <p>
+          ESPConnect runs fully in your browser—there is no backend, account, or telemetry. Firmware files, backups, and
+          diagnostics stay local and only move when you download them yourself. Always flash firmware from trusted sources.
+        </p>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
