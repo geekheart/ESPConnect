@@ -5060,7 +5060,7 @@ async function connect() {
     const featuresRaw = await callChip('getChipFeatures');
     const crystalFreq = await callChip('getCrystalFreq');
     const macAddress = await callChip('readMac');
-    const flashSizeKb = await loader.value.getFlashSize().catch(() => undefined);
+    const flashSizeRaw = await loader.value.getFlashSize().catch(() => undefined);
     const packageVersion = await callChip('getPkgVersion');
     const chipRevision = await callChip('getChipRevision');
     const majorVersion = await callChip('getMajorChipVersion');
@@ -5080,7 +5080,7 @@ async function connect() {
     const capacityCodeRaw =
       typeof flashId === 'number' && Number.isFinite(flashId) ? (flashId >> 16) & 0xff : null;
     appendLog(
-      `Flash detect raw: getFlashSize=${Number.isFinite(flashSizeKb) ? `${flashSizeKb} KB` : 'n/a'}, flashId=${typeof flashId === 'number' && Number.isFinite(flashId) ? `0x${flashId
+      `Flash detect raw: getFlashSize=${Number.isFinite(flashSizeRaw) ? `${flashSizeRaw}` : 'n/a'}, flashId=${typeof flashId === 'number' && Number.isFinite(flashId) ? `0x${flashId
         .toString(16)
         .padStart(6, '0')
         .toUpperCase()}` : 'n/a'} (manuf=0x${Number.isInteger(manufacturerCode)
@@ -5104,9 +5104,23 @@ async function connect() {
       );
     let flashBytesValue = null;
     let flashLabelSuffix = '';
-    if (typeof flashSizeKb === 'number' && flashSizeKb > 0) {
-      flashBytesValue = flashSizeKb * 1024;
-    } else {
+    const MAX_REASONABLE_FLASH_BYTES = 256 * 1024 * 1024 * 1024; // 256 GB sanity cap
+    if (typeof flashSizeRaw === 'number' && flashSizeRaw > 0) {
+      const asBytes = flashSizeRaw;
+      const asKbBytes = flashSizeRaw * 1024;
+      if (Number.isFinite(asBytes) && asBytes > 0 && asBytes <= MAX_REASONABLE_FLASH_BYTES) {
+        flashBytesValue = asBytes;
+        flashLabelSuffix = ' (via stub)';
+      } else if (
+        Number.isFinite(asKbBytes) &&
+        asKbBytes > 0 &&
+        asKbBytes <= MAX_REASONABLE_FLASH_BYTES
+      ) {
+        flashBytesValue = asKbBytes;
+        flashLabelSuffix = ' (via stub KB)';
+      }
+    }
+    if (!flashBytesValue) {
       const capacityCandidates = [capacityCodeRaw, memoryTypeCode, manufacturerCode].filter(
         value =>
           Number.isInteger(value) &&
@@ -5130,13 +5144,9 @@ async function connect() {
           break;
         }
       }
-      if (
-        !flashBytesValue &&
-        hasOctalFlash &&
-        Number.isInteger(capacityCodeRaw) &&
-        capacityCodeRaw >= 0x30 &&
-        capacityCodeRaw <= 0x3f
-      ) {
+      const isOctalCapacityCode =
+        Number.isInteger(capacityCodeRaw) && capacityCodeRaw >= 0x30 && capacityCodeRaw <= 0x3f;
+      if (!flashBytesValue && isOctalCapacityCode) {
         const mappedCapacityCode = capacityCodeRaw - 0x20; // vendor-specific octal ID codes sit +0x20 above standard
         const fallbackFlashBytes = Math.pow(2, mappedCapacityCode);
         if (Number.isFinite(fallbackFlashBytes) && fallbackFlashBytes > 0) {
