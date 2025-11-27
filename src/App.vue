@@ -986,12 +986,12 @@ async function loadLittlefsPartition(partition) {
   const littlefsBaudLabel = currentBaud.value ? ` @ ${currentBaud.value.toLocaleString()} bps` : '';
   littlefsState.status = `Reading LittleFS @ 0x${partition.offset.toString(16).toUpperCase()}${littlefsBaudLabel}...`;
   littlefsLoadingDialog.visible = true;
-  littlefsLoadingDialog.label = `Reading ${partition.label || 'LittleFS'}${littlefsBaudLabel}...`;
+  littlefsLoadingDialog.label = `Reading LittleFS${littlefsBaudLabel}...`;
   const attemptedConfigs = [];
   try {
     await releaseTransportReader();
     const image = await readFlashToBuffer(partition.offset, partition.size, {
-      label: `${partition.label || 'LittleFS'}${littlefsBaudLabel}`,
+      label: `LittleFS${littlefsBaudLabel}`,
       cancelSignal: littlefsLoadCancelRequested,
       onProgress: progress => {
         littlefsLoadingDialog.label = progress.label;
@@ -3001,6 +3001,35 @@ async function readFlashToBuffer(offset, length, options = {}) {
   return buffer;
 }
 
+async function detectFilesystemType(loader, offset, size) {
+  try {
+    // Read first 8KB to scan for filesystem signature
+    const readSize = Math.min(8192, size);
+    const data = await loader.readFlash(offset, readSize);
+    
+    if (data.length < 32) {
+      return 'spiffs';
+    }
+    
+    // Check for "littlefs" ASCII string in the data
+    // LittleFS stores this string in its superblock
+    const textDecoder = new TextDecoder('ascii');
+    const dataStr = textDecoder.decode(data);
+    if (dataStr.includes('littlefs')) {
+      console.log('LittleFS detected: found "littlefs" string in partition data');
+      return 'littlefs';
+    }
+    
+    // If no "littlefs" string found, assume SPIFFS
+    console.log('SPIFFS assumed: no "littlefs" string found in partition data');
+    return 'spiffs';
+  } catch (err) {
+    console.warn('Failed to detect filesystem type', err);
+    // On error, default to SPIFFS
+    return 'spiffs';
+  }
+}
+
 async function readPartitionTable(loader, offset = 0x8000, length = 0x400) {
   try {
     const data = await loader.readFlash(offset, length);
@@ -3022,6 +3051,15 @@ async function readPartitionTable(loader, offset = 0x8000, length = 0x400) {
         .trim();
       entries.push({ label: label || `type 0x${type.toString(16)}`, type, subtype, offset: addr, size });
     }
+    
+    // Detect filesystem type for 0x82 partitions
+    for (const entry of entries) {
+      if (entry.type === 0x01 && entry.subtype === 0x82) {
+        entry.detectedFilesystem = await detectFilesystemType(loader, entry.offset, entry.size);
+        console.log(`Partition "${entry.label}" at 0x${entry.offset.toString(16)}: detected as ${entry.detectedFilesystem}`);
+      }
+    }
+    
     return entries;
   } catch (err) {
     console.warn('Failed to read partition table', err);
@@ -3295,7 +3333,9 @@ const spiffsPartitions = computed(() =>
         typeof entry.type === 'number' &&
         typeof entry.subtype === 'number' &&
         entry.type === 0x01 &&
-        entry.subtype === 0x82,
+        entry.subtype === 0x82 &&
+        // Show only partitions that are NOT detected as LittleFS
+        entry.detectedFilesystem !== 'littlefs',
     )
     .map(entry => ({
       id: entry.offset,
@@ -3320,8 +3360,9 @@ const littleFsPartitions = computed(() =>
       if (entry.type !== 0x01) {
         return false;
       }
-      const label = entry.label?.toLowerCase().trim() || '';
-      return entry.subtype === 0x83 || label.includes('littlefs');
+      // LittleFS: dedicated subtype 0x83 OR 0x82 with detected LittleFS
+      return entry.subtype === 0x83 || 
+             (entry.subtype === 0x82 && entry.detectedFilesystem === 'littlefs');
     })
     .map(entry => ({
       id: entry.offset,
