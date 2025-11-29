@@ -21,7 +21,7 @@ export interface EsptoolClient {
   changeBaud: (baud: number) => Promise<void>;
   readPartitionTable: (offset?: number, length?: number) => Promise<any[]>;
   readFlashId: () => Promise<number | undefined>;
-  detectFlashSize: () => Promise<number | undefined>;
+  detectFlashSize: () => Promise<string | undefined>;
   readChipMetadata: () => Promise<{
     description: string | undefined;
     features: any;
@@ -117,8 +117,12 @@ export function createEsptoolClient({
     }
   }
 
-  async function detectFlashSize() {
-    return await loader.detectFlashSize();
+  async function detectFlashSize(): Promise<string | undefined> {
+    try {
+      return await loader.detectFlashSize();
+    } catch {
+      return undefined;
+    }
   }
 
   async function readChipMetadata() {
