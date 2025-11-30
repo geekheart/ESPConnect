@@ -1,5 +1,8 @@
 import { createApp } from 'vue';
+import { createI18n } from 'vue-i18n';
 import App from './App.vue';
+import en from './locales/en.json';
+import zh from './locales/zh.json';
 
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
@@ -14,4 +17,16 @@ const vuetify = createVuetify({
   directives,
 });
 
-createApp(App).use(vuetify).mount('#app');
+const i18n = createI18n({
+  locale: 'zh',
+  fallbackLocale: 'zh',
+  messages: {
+    en,
+    zh
+  }
+})
+
+const app = createApp(App)
+app.use(vuetify)
+app.use(i18n)
+app.mount('#app')

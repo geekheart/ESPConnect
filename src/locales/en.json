@@ -1,0 +1,78 @@
+{
+  "baud": "Baud rate",
+  "connection_chip": {
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "app": {
+    "title": "ESPConnect"
+  },
+  "buttons": {
+    "connect": "Connect",
+    "disconnect": "Disconnect"
+  },
+  "menu": {
+    "selects": "Sections",
+    "resources": "Resources"
+  },
+  "language": {
+    "select": "Language",
+    "choose": "Choose Language"
+  },
+  "submenu": [
+    { "title": "Device Info" },
+    { "title": "Partitions" },
+    { "title": "Applications" },
+    { "title": "SPIFFS Tools" },
+    { "title": "LittleFS Tools" },
+    { "title": "FATFS Tools" },
+    { "title": "Flash Tools" },
+    { "title": "Serial Monitor" },
+    { "title": "Session Log" },
+    { "title": "About" }
+  ],
+  "resources": [
+    {
+      "title": "Tutorial",
+      "href": "https://youtu.be/-nhDKzBxHiI",
+      "icon": "mdi-youtube"
+    },
+    {
+      "title": "Buy Me a Coffee",
+      "href": "https://www.buymeacoffee.com/kirto",
+      "icon": "mdi-coffee"
+    },
+    {
+      "title": "Get Help",
+      "href": "https://github.com/thelastoutpostworkshop/ESPConnect",
+      "icon": "mdi-lifebuoy"
+    }
+  ],
+  "alerts": {
+    "webSerialNotSupported": "This browser does not support the Web Serial API. Use Chrome, Edge, or another Chromium-based browser.",
+    "serialMonitorReconnectNotice": "Serial monitor closed — click Connect to re-enter maintenance mode."
+  },
+  "spiffs": {
+    "disconnectState": "Connect to an ESP32 to browse and edit SPIFFS files."
+  },
+  "littlefs": {
+    "disconnectState": "Connect to an ESP32 with a LittleFS partition to use these tools.",
+    "emptyStateMessage": "No LittleFS files found. Read the partition or upload to begin.",
+    "backupDialog": "Preparing backup..."
+  },
+  "fatfs": {
+    "disconnectState": "Connect to an ESP32 with a FATFS partition to use these tools.",
+    "emptyStateMessage": "No FATFS files found. Read the partition or upload to begin."
+  },
+  "apps": {
+    "disconnectState": "Connect to a device to inspect OTA application slots."
+  },
+  "flash": {
+    "disconnectState": "Connect to your board to flash firmware or inspect registers."
+  },
+  "confirmationDialog": {
+    "title": "Please confirm",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+}

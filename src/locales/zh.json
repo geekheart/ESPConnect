@@ -1,0 +1,78 @@
+{
+  "baud": "波特率",
+  "connection_chip": {
+    "connected": "已连接",
+    "disconnected": "未连接"
+  },
+  "app": {
+    "title": "ESP连接工具"
+  },
+  "buttons": {
+    "connect": "连接",
+    "disconnect": "断开连接"
+  },
+  "menu": {
+    "selects": "菜单选择",
+    "resources": "资源"
+  },
+  "language": {
+    "select": "语言",
+    "choose": "选择语言"
+  },
+  "submenu": [
+    {"title": "设备信息"},
+    {"title": "分区信息"},
+    {"title": "应用程序"},
+    {"title": "SPIFFS 工具"},
+    {"title": "LittleFS 工具"},
+    {"title": "FATFS 工具"},
+    {"title": "刷写工具"},
+    {"title": "串口监视器"},
+    {"title": "会话日志"},
+    {"title": "关于" }
+  ],
+  "resources": [
+    {
+      "title": "教程",
+      "href": "https://youtu.be/-nhDKzBxHiI",
+      "icon": "mdi-play"
+    },
+    {
+      "title": "淘宝店",
+      "href": "https://shop538225597.taobao.com/shop/view_shop.htm",
+      "icon": "mdi-shopping"
+    },
+    {
+      "title": "获取帮助",
+      "href": "https://github.com/thelastoutpostworkshop/ESPConnect",
+      "icon": "mdi-help-circle"
+    }
+  ],
+  "alerts": {
+    "webSerialNotSupported": "此浏览器不支持 Web Serial API。请使用 Chrome、Edge 或其他基于 Chromium 的浏览器。",
+    "serialMonitorReconnectNotice": "串口监视器已关闭 — 点击连接以重新进入维护模式。"
+  },
+  "spiffs": {
+    "disconnectState": "连接到 ESP32 以浏览和编辑 SPIFFS 文件。"
+  },
+  "littlefs": {
+    "disconnectState": "连接到具有 LittleFS 分区的 ESP32 以使用这些工具。",
+    "emptyStateMessage": "未找到 LittleFS 文件。读取分区或上传以开始。",
+    "backupDialog": "正在准备备份..."
+  },
+  "fatfs": {
+    "disconnectState": "连接到具有 FATFS 分区的 ESP32 以使用这些工具。",
+    "emptyStateMessage": "未找到 FATFS 文件。读取分区或上传以开始。"
+  },
+  "apps": {
+    "disconnectState": "连接到设备以检查 OTA 应用程序槽。"
+  },
+  "flash": {
+    "disconnectState": "连接到您的开发板以刷写固件或检查寄存器。"
+  },
+  "confirmationDialog": {
+    "title": "请确认",
+    "confirm": "确认",
+    "cancel": "取消"
+  }
+}
