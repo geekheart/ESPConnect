@@ -1,61 +1,25 @@
-[<img src="https://github.com/thelastoutpostworkshop/images/blob/main/ESPConnect-github.png">](https://youtu.be/-nhDKzBxHiI)
-# ESPConnect
-<a href="https://www.buymeacoffee.com/thelastoutpostworkshop" target="_blank">
-<img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee">
-</a>
+# ESP CONNECT
 
-ESPConnect is a browser-based control center for ESP32- and ESP8266-class boards. It runs entirely inside a modern Chromium browser so you can inspect hardware details, manage SPIFFS files, back up flash, and deploy firmware without installing desktop software.
-- [Tutorial](https://youtu.be/-nhDKzBxHiI)
-- [Web application](https://thelastoutpostworkshop.github.io/microcontroller_devkit/espconnect/)
+ESPConnect 是一个基于浏览器的控制中心，适用于 ESP32 和 ESP8266 系列开发板。它完全运行在现代 Chromium 浏览器中，因此您可以查看硬件详细信息、管理 SPIFFS 文件、备份闪存以及部署固件，而无需安装桌面软件。
 
-## What You Need
-- Chrome, Edge, Brave, Arc, or another Chromium browser based on version 89 or newer.  
-- An ESP32, ESP32-C3, ESP32-S2, ESP32-S3, ESP32-C6, ESP32-H2, ESP32-C5, ESP32-P4, or ESP8266 board connected over USB.  
-- A USB cable with data lines. If your board lacks automatic reset wiring, the app walks you through entering the bootloader manually.
+本fork主要是添加了翻译功能，对其进行汉化，并设置初始化语言为中文。
 
-## Quick Start
-1. Open [ESPConnect](https://thelastoutpostworkshop.github.io/microcontroller_devkit/espconnect/).  
-2. Click **Connect** and choose your device when the browser asks for permission.  
-3. After the handshake completes, the navigation drawer unlocks every tool: Device Info, Partitions, SPIFFS, Apps, Flash, Console, and Logs.  
-4. Use **Disconnect** whenever you want to free the USB port for another application.
+# 编译运行
 
+1. 安装node.js
+2. 安装组件
+```shell
+npm install
+```
+3. 运行服务
+```shell
+npm run dev
+```
 
-## Feature Overview
+# 如何汉化
 
-### Device & flash awareness
-- **Device Info tab** – live summary of chip family, revision, MAC address, flash size, crystal frequency, capabilities, and curated fact groups. A “No device connected” card appears automatically when nothing is attached.  
-- **Partitions tab** – graphical map plus a detailed table of every partition entry, including sizes, offsets, and unused flash so you can double-check layout decisions before flashing.
+1. 如果是标签对的标签内容，需要加```{{$t('json路径')}}```，则可以映射到对应的翻译位置。
+2. 如果是标签对的属性，比如```label="hello"```则需要改成```:label="$t('json路径')"```
+3. 如果是js的变量，需要改成响应式变量并通过```t('json路径')```赋值
 
-### File system manager (supports SPIFFS, LittleFS and FATFS)
-- Browse the files with instant text filtering, pagination controls.  
-- Upload by file picker or drag-and-drop; the app checks available space and blocks oversized files before they transfer.  
-- Run full file system backups, restore an image, or format the partition (after confirming you have a backup).  
-- Stage edits locally, then push them down with **Save to Flash** once you are satisfied.  
-- Preview UTF‑8 text (JSON, HTML, logs, etc.), render images inline, and listen to audio formats such as MP3, WAV, OGG/Opus, AAC/M4A, FLAC, and WebM—all without leaving the browser.  
-- Download or delete individual files, and keep an eye on usage gauges that show used, free, and total bytes.
-
-### OTA slot insights
-- **Apps tab** – inspect application slots/OTA partitions. See which slot is active along with build metadata, sizes, and other identifying details so you always know what firmware is currently running and what is staged next.
-
-### Flash & maintenance workspace
-- **Flash Firmware** – load any `.bin`, pick from common offset presets, optionally erase the entire chip, and watch progress through detailed dialogs.  
-- **Backups & downloads** – capture individual partitions, the whole partition table, only the used areas of flash, or arbitrary regions you specify.  
-- **Integrity checks** – supply an offset and length to compute MD5 hashes for quick validation of what is stored on the device.  
-- **Register access** – read or write hardware registers directly using the integrated guide of addresses and descriptions.  
-- **Control actions** – cancel long transfers, stop backups, erase flash, or save staged SPIFFS changes with clear confirmations and progress indicators.
-
-### Live monitoring & history
-- **Serial Monitor tab** – stream UART output, send commands, clear the console, change baud rate, or reset the board right from the browser.  
-- **Session Log tab** – chronological ledger of connects, flashes, downloads, and warnings. Clear it whenever you want a clean slate.
-
-## Tips & Troubleshooting
-- If automatic boot entry fails, hold **BOOT**, tap **RESET**, keep holding **BOOT** while clicking **Connect**, then release when you see the ESP-ROM banner.  
-- Only one application can use the USB serial bridge at a time. Close Arduino IDE, PlatformIO, or other tools before connecting.  
-- You can change baud rate even after connecting. If transfers stall, drop to 460800 or 115200 bps.  
-- Cancelling a flash or download pauses safely. Simply run it again when you’re ready.  
-
-## Privacy & Security
-ESPConnect runs fully in your browser—there is no backend, account, or telemetry. Firmware files, backups, and diagnostics stay local and only move when you download them yourself. Always flash firmware from trusted sources.
-
-## License
-ESPConnect is released under the MIT License. See [LICENSE](LICENSE) for the full text.
+最终保存在en.json和zh.json中
