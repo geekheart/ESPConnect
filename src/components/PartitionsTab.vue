@@ -6,9 +6,9 @@
           <v-icon size="34">mdi-table-refresh</v-icon>
         </v-avatar>
         <div class="partitions-empty__text">
-          <div class="partitions-empty__title">No partition data yet</div>
+          <div class="partitions-empty__title">{{ $t("partition.empty.title") }}</div>
           <div class="partitions-empty__subtitle">
-            Connect to an ESP32 to load its partition table.
+            {{ $t("partition.empty.subtitle") }}
           </div>
         </div>
       </v-card-text>

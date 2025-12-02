@@ -1,6 +1,6 @@
 {
   "baud": "波特率",
-  "connection_chip": {
+  "connectionChip": {
     "connected": "已连接",
     "disconnected": "未连接"
   },
@@ -9,7 +9,10 @@
   },
   "buttons": {
     "connect": "连接",
-    "disconnect": "断开连接"
+    "disconnect": "断开连接",
+    "gotIt": "知道了",
+    "close": "关闭",
+    "download": "下载"
   },
   "menu": {
     "selects": "菜单选择",
@@ -20,16 +23,16 @@
     "choose": "选择语言"
   },
   "submenu": [
-    {"title": "设备信息"},
-    {"title": "分区信息"},
-    {"title": "应用程序"},
-    {"title": "SPIFFS 工具"},
-    {"title": "LittleFS 工具"},
-    {"title": "FATFS 工具"},
-    {"title": "刷写工具"},
-    {"title": "串口监视器"},
-    {"title": "会话日志"},
-    {"title": "关于" }
+    { "title": "设备信息" },
+    { "title": "分区信息" },
+    { "title": "应用程序" },
+    { "title": "SPIFFS 工具" },
+    { "title": "LittleFS 工具" },
+    { "title": "FATFS 工具" },
+    { "title": "刷写工具" },
+    { "title": "串口监视器" },
+    { "title": "会话日志" },
+    { "title": "关于" }
   ],
   "resources": [
     {
@@ -53,16 +56,28 @@
     "serialMonitorReconnectNotice": "串口监视器已关闭 — 点击连接以重新进入维护模式。"
   },
   "spiffs": {
-    "disconnectState": "连接到 ESP32 以浏览和编辑 SPIFFS 文件。"
+    "disconnectState": "连接到 ESP32 以浏览和编辑 SPIFFS 文件。",
+    "backupDialog": "正在准备备份...",
+    "saveDialog": "正在写入 SPIFFS 镜像...",
+    "restoreDialog": "正在恢复 SPIFFS 镜像...",
+    "viewerDialog": {
+      "title": "预览",
+      "audioNotSupported": "您的浏览器不支持音频播放。"
+    }
   },
   "littlefs": {
     "disconnectState": "连接到具有 LittleFS 分区的 ESP32 以使用这些工具。",
     "emptyStateMessage": "未找到 LittleFS 文件。读取分区或上传以开始。",
-    "backupDialog": "正在准备备份..."
+    "backupDialog": "正在准备备份...",
+    "saveDialog": "正在写入 LittleFS 镜像...",
+    "restoreDialog": "正在恢复 LittleFS 镜像..."
   },
   "fatfs": {
     "disconnectState": "连接到具有 FATFS 分区的 ESP32 以使用这些工具。",
-    "emptyStateMessage": "未找到 FATFS 文件。读取分区或上传以开始。"
+    "emptyStateMessage": "未找到 FATFS 文件。读取分区或上传以开始。",
+    "backupDialog": "正在准备备份...",
+    "saveDialog": "正在写入 FATFS 镜像...",
+    "restoreDialog": "正在恢复 FATFS 镜像..."
   },
   "apps": {
     "disconnectState": "连接到设备以检查 OTA 应用程序槽。"
@@ -74,5 +89,76 @@
     "title": "请确认",
     "confirm": "确认",
     "cancel": "取消"
+  },
+  "busyDialog": {
+    "message": "所选串口正忙。请关闭任何其他使用该端口的应用程序或标签页，然后重试。",
+    "tryAgain": "如果您刚刚从另一个工具断开连接，请稍等片刻以释放端口。"
+  },
+  "bootDialog": {
+    "title": "连接提示",
+    "description": [
+      "我们无法与开发板通信。请尝试将您的 ESP32 置于引导加载模式：",
+      "按住 BOOT 按钮并保持按下状态。",
+      "点击 RESET，然后仅释放 RESET 按钮。",
+      "在仍然按住 BOOT 的情况下，点击 连接。",
+      "一旦日志显示 ESP-ROM 横幅或连接完成，释放 BOOT 按钮。"
+    ]
+  },
+  "about": [
+    {
+      "title": "关于 ESP连接工具",
+      "description": [
+        "ESPConnect 是一个基于浏览器的 ESP32 设备工具包。它将常见的维护任务集中在一起，让您无需安装桌面实用程序即可连接、检查和更新您的开发板。",
+        "该应用程序通过 Web Serial API 与设备通信，然后提供用于固件刷写、分区管理、文件系统编辑、备份/恢复工作流程以及会话日志和串口监视器的高级工具，以便进行故障排除。"
+      ]
+    },
+    {
+      "title": "文件系统工具",
+      "description": [
+        "SPIFFS：用于在本地暂存更改然后写入闪存的 TypeScript 模拟器。",
+        "LittleFS：功能齐全的 LittleFS v2 实现，支持文件上传、下载、备份和恢复。",
+        "FATFS：读取和写入 FATFS 分区，支持大文件和目录结构。",
+        "拖放上传、常见文件类型的预览/收听、差异摘要以及在保存之前进行强制备份可确保工作流程的安全性。"
+      ]
+    },
+    {
+      "title": "固件与维护",
+      "description": [
+        "刷写自定义二进制文件，具有进度跟踪、预设和安全提示。",
+        "一目了然地检查分区表、OTA 槽、设备描述符和闪存使用情况。",
+        "串口监视器，带有命令快捷方式和会话日志功能，便于故障排除。"
+      ]
+    },
+    {
+      "title": "安全第一的工作流",
+      "description": [
+        "每个破坏性操作都需要经过确认提示和最近的备份。ESPConnect 会将暂存的更改保存在内存中，直到您明确将其写入闪存，从而使您可以轻松查看修改内容或通过重新读取分区来恢复。"
+      ]
+    },
+    {
+      "title": "隐私与安全",
+      "description": [
+        "ESPConnect 完全在您的浏览器中运行——没有后端、账户或遥测。固件文件、备份和诊断保持本地，只有在您自己下载时才会移动。始终从可信来源刷写固件。"
+      ]
+    }
+  ],
+  "disconnect": {
+    "title": "未连接设备",
+    "subtitle": "请连接到 ESP32 以使用此工具。"
+  },
+  "info": {
+    "memory": "闪存与时钟",
+    "features": "功能集",
+    "more": "更多",
+    "empty": "无可选功能",
+    "disconnectState": "连接到 ESP32 以查看设备信息",
+    "capabilities": "功能",
+    "noFeaturesReported": "未报告任何功能"
+  },
+  "partition": {
+    "empty": {
+      "title": "尚无分区数据",
+      "subtitle": "连接到 ESP32 以加载其分区表。"
+    }
   }
 }

@@ -328,7 +328,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ littlefsSaveDialog.label || 'Writing LittleFS image...' }}
+                {{ littlefsSaveDialog.label || $t('littlefs.saveDialog') }}
               </div>
               <v-progress-linear :model-value="littlefsSaveDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(littlefsSaveDialog.value))) }}%</strong>
@@ -345,7 +345,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ littlefsRestoreDialog.label || 'Writing LittleFS image...' }}
+                {{ littlefsRestoreDialog.label || $t('littlefs.restoreDialog') }}
               </div>
               <v-progress-linear :model-value="littlefsRestoreDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(littlefsRestoreDialog.value))) }}%</strong>
@@ -362,7 +362,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ fatfsBackupDialog.label || 'Preparing backup...' }}
+                {{ fatfsBackupDialog.label || $t('fatfs.restoreDialog') }}
               </div>
               <v-progress-linear :model-value="fatfsBackupDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(fatfsBackupDialog.value))) }}%</strong>
@@ -407,7 +407,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ fatfsSaveDialog.label || 'Writing FATFS image...' }}
+                {{ fatfsSaveDialog.label || $t('fatfs.saveDialog') }}
               </div>
               <v-progress-linear :model-value="fatfsSaveDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(fatfsSaveDialog.value))) }}%</strong>
@@ -424,7 +424,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ fatfsRestoreDialog.label || 'Writing FATFS image...' }}
+                {{ fatfsRestoreDialog.label || $t('fatfs.restoreDialog') }}
               </div>
               <v-progress-linear :model-value="fatfsRestoreDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(fatfsRestoreDialog.value))) }}%</strong>
@@ -441,7 +441,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ spiffsBackupDialog.label || 'Preparing backup...' }}
+                {{ spiffsBackupDialog.label || $t('spiffs.backupDialog') }}
               </div>
               <v-progress-linear :model-value="spiffsBackupDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(spiffsBackupDialog.value))) }}%</strong>
@@ -486,7 +486,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ spiffsSaveDialog.label || 'Writing SPIFFS image...' }}
+                {{ spiffsSaveDialog.label || $t('spiffs.saveDialog') }}
               </div>
               <v-progress-linear :model-value="spiffsSaveDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(spiffsSaveDialog.value))) }}%</strong>
@@ -503,7 +503,7 @@
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
-                {{ spiffsRestoreDialog.label || 'Writing SPIFFS image...' }}
+                {{ spiffsRestoreDialog.label || $t('spiffs.restoreDialog') }}
               </div>
               <v-progress-linear :model-value="spiffsRestoreDialog.value" height="24" color="primary" rounded>
                 <strong>{{ Math.min(100, Math.max(0, Math.floor(spiffsRestoreDialog.value))) }}%</strong>
@@ -520,10 +520,10 @@
             </v-card-title>
             <v-card-text>
               <p class="text-body-2">
-                {{ busyDialogMessage || 'The selected serial port is busy. Close any other apps or tabs using it and try again.' }}
+                {{ busyDialogMessage || $t('busyDialog.message') }}
               </p>
               <p class="text-caption text-medium-emphasis">
-                If you just disconnected from another tool, wait a moment for the OS to release the port.
+                {{ $t('busyDialog.tryAgain') }}
               </p>
             </v-card-text>
             <v-card-actions>
@@ -539,17 +539,17 @@
           <v-card>
             <v-card-title class="text-h6">
               <v-icon start color="warning">mdi-alert-circle-outline</v-icon>
-              Connection Tips
+              {{ $t('bootDialog.title') }}
             </v-card-title>
             <v-card-text>
               <p class="text-body-2">
-                We couldn't communicate with the board. Try putting your ESP32 into bootloader mode:
+                {{ $t('bootDialog.description[0]') }}
               </p>
               <ol class="text-body-2 ps-4">
-                <li>Press and hold the <strong>BOOT</strong> (GPIO0) button and keep it held down.</li>
-                <li>Tap <strong>RESET</strong>, then release only the RESET button.</li>
-                <li>While still holding BOOT, click <strong>Connect</strong>.</li>
-                <li>Release the BOOT button once the log shows the ESP-ROM banner or the connection completes.</li>
+                <li>{{ $t('bootDialog.description[1]') }}</li>
+                <li>{{ $t('bootDialog.description[2]') }}</li>
+                <li>{{ $t('bootDialog.description[3]') }}</li>
+                <li>{{ $t('bootDialog.description[4]') }}</li>
               </ol>
               <p class="text-caption text-medium-emphasis" v-if="lastErrorMessage">
                 Last error: {{ lastErrorMessage }}
@@ -558,7 +558,7 @@
             <v-card-actions>
               <v-spacer />
               <v-btn color="primary" variant="text" @click="showBootDialog = false">
-                Got it
+                {{ $t('buttons.gotIt') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -569,7 +569,7 @@
           <v-card>
             <v-card-title class="text-h6 d-flex align-center">
               <v-icon start>mdi-eye</v-icon>
-              {{ spiffsViewerDialog.name || 'Preview' }}
+              {{ spiffsViewerDialog.name || $t('spiffs.viewerDialog.title') }}
             </v-card-title>
             <v-card-text>
               <v-progress-linear v-if="spiffsViewerDialog.loading" indeterminate color="primary" class="mb-4" />
@@ -581,7 +581,7 @@
                   :src="spiffsViewerDialog.imageUrl" class="spiffs-viewer__image" :alt="spiffsViewerDialog.name" />
                 <audio v-else-if="spiffsViewerDialog.mode === 'audio' && spiffsViewerDialog.audioUrl"
                   :src="spiffsViewerDialog.audioUrl" class="spiffs-viewer__audio" controls preload="auto">
-                  Your browser does not support audio playback.
+                  {{ $t('spiffs.viewerDialog.audioNotSupported') }}
                 </audio>
                 <pre v-else class="spiffs-viewer__content">{{ spiffsViewerDialog.content }}</pre>
               </template>
@@ -589,12 +589,12 @@
             <v-card-actions>
               <v-spacer />
               <v-btn variant="text" @click="closeSpiffsViewer">
-                Close
+                {{ $t('buttons.close') }}
               </v-btn>
               <v-btn color="primary" variant="tonal" :disabled="!spiffsViewerDialog.name"
                 @click="handleFilesystemViewerDownload">
                 <v-icon start>mdi-download</v-icon>
-                Download
+                {{ $t('buttons.download') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -4291,11 +4291,11 @@ watch([md5Offset, md5Length], ([offsetValue, lengthValue]) => {
 
 const connectionChipLabel = computed(() => {
   if (!connected.value) {
-    return t('connection_chip.disconnected');
+    return t('connectionChip.disconnected');
   }
 
   const name = chipDetails.value?.name?.trim();
-  return name ? `${name}` : t('connection_chip.connected');
+  return name ? `${name}` : t('connectionChip.connected');
 });
 
 const canFlash = computed(

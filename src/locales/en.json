@@ -1,6 +1,6 @@
 {
   "baud": "Baud rate",
-  "connection_chip": {
+  "connectionChip": {
     "connected": "Connected",
     "disconnected": "Disconnected"
   },
@@ -9,7 +9,10 @@
   },
   "buttons": {
     "connect": "Connect",
-    "disconnect": "Disconnect"
+    "disconnect": "Disconnect",
+    "gotIt": "Got it",
+    "close": "Close",
+    "download": "Download"
   },
   "menu": {
     "selects": "Sections",
@@ -53,16 +56,28 @@
     "serialMonitorReconnectNotice": "Serial monitor closed — click Connect to re-enter maintenance mode."
   },
   "spiffs": {
-    "disconnectState": "Connect to an ESP32 to browse and edit SPIFFS files."
+    "disconnectState": "Connect to an ESP32 to browse and edit SPIFFS files.",
+    "backupDialog": "Preparing backup...",
+    "saveDialog": "Writing SPIFFS image...",
+    "restoreDialog": "Restoring SPIFFS image...",
+    "viewerDialog": {
+      "title": "Preview",
+      "audioNotSupported": "Your browser does not support audio playback."
+    }
   },
   "littlefs": {
     "disconnectState": "Connect to an ESP32 with a LittleFS partition to use these tools.",
     "emptyStateMessage": "No LittleFS files found. Read the partition or upload to begin.",
-    "backupDialog": "Preparing backup..."
+    "backupDialog": "Preparing backup...",
+    "saveDialog": "Writing LittleFS image...",
+    "restoreDialog": "Restoring LittleFS image..."
   },
   "fatfs": {
     "disconnectState": "Connect to an ESP32 with a FATFS partition to use these tools.",
-    "emptyStateMessage": "No FATFS files found. Read the partition or upload to begin."
+    "emptyStateMessage": "No FATFS files found. Read the partition or upload to begin.",
+    "backupDialog": "Preparing backup...",
+    "saveDialog": "Writing FATFS image...",
+    "restoreDialog": "Restoring FATFS image..."
   },
   "apps": {
     "disconnectState": "Connect to a device to inspect OTA application slots."
@@ -74,5 +89,76 @@
     "title": "Please confirm",
     "confirm": "Confirm",
     "cancel": "Cancel"
+  },
+  "busyDialog": {
+    "message": "The selected serial port is busy. Close any other apps or tabs using it and try again.",
+    "tryAgain": "If you just disconnected from another tool, wait a moment for the OS to release the port."
+  },
+  "bootDialog": {
+    "title": "Connection Tips",
+    "description": [
+      "We couldn't communicate with the board. Try putting your ESP32 into bootloader mode:",
+      "Press and hold the BOOT button and keep it held down.",
+      "Tap RESET, then release only the RESET button.",
+      "While still holding BOOT, click Connect.",
+      "Release the BOOT button once the log shows the ESP-ROM banner or the connection completes."
+    ]
+  },
+  "about": [
+    {
+      "title": "About ESPConnect",
+      "description": [
+        "ESPConnect is a browser-based toolkit for ESP32 devices. It brings common maintenance tasks together so you can connect, inspect and update your board without installing desktop utilities.",
+        "The application talks to the device over the Web Serial API, then exposes high-level tools for firmware flashing, partition management, filesystem editing, backup/restore workflows, as well as a session log and serial monitor for troubleshooting."
+      ]
+    },
+    {
+      "title": "Filesystem Tools",
+      "description": [
+        "SPIFFS: TypeScript emulator for staging changes locally before writing flash.",
+        "LittleFS: Full-featured LittleFS v2 implementation with file upload, download, backup, and restore.",
+        "FATFS: Read and write FATFS partitions with support for large files and directory structures.",
+        "Drag-and-drop uploads, preview/listen for common file types, diff summaries, and mandatory backups before saving keep the workflow safe."
+      ]
+    },
+    {
+      "title": "Firmware & Maintenance",
+      "description": [
+        "Flash custom binaries with progress tracking, presets, and safety prompts.",
+        "Inspect partition tables, OTA slots, device descriptors, and flash usage at a glance.",
+        "Serial monitor with command shortcuts and session logging for troubleshooting."
+      ]
+    },
+    {
+      "title": "Safety-first Workflow",
+      "description": [
+        "Every destructive action is gated behind confirmation prompts and recent backups. ESPConnect keeps staged changes in-memory until you explicitly write them to flash, making it easy to review modifications or revert by re-reading the partition."
+      ]
+    },
+    {
+      "title": "Privacy & Security",
+      "description": [
+        "ESPConnect runs fully in your browser—there is no backend, account, or telemetry. Firmware files, backups, and diagnostics stay local and only move when you download them yourself. Always flash firmware from trusted sources."
+      ]
+    }
+  ],
+  "disconnect": {
+    "title": "No device connected",
+    "subtitle": "Connect to an ESP32 to continue."
+  },
+  "info": {
+    "memory": "Flash & Clock",
+    "features": "Feature Set",
+    "more": "more",
+    "empty": "No optional capabilities.",
+    "disconnectState": "Connect to an ESP32 to view device information.",
+    "capabilities": "capabilities",
+    "noFeaturesReported": "No features reported"
+  },
+  "partition": {
+    "empty": {
+      "title": "No partition data yet",
+      "subtitle": "Connect to an ESP32 to load its partition table."
+    }
   }
 }

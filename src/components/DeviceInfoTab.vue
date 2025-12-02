@@ -27,11 +27,7 @@
                 <div class="summary-block">
                   <div class="summary-label">
                     <v-icon size="40" class="me-2">mdi-memory</v-icon>
-                    Flash & Clock
-                  </div>
-                  <div class="summary-value">{{ details.flashSize || 'Unknown' }}</div>
-                  <div v-if="details.crystal" class="summary-meta">
-                    Crystal {{ details.crystal }}
+                    {{ $t("info.memory") }}
                   </div>
                   <div v-if="primaryFacts.length" class="summary-list">
                     <div v-for="fact in primaryFacts" :key="fact.label" class="summary-list__item">
@@ -44,10 +40,10 @@
                 <div class="summary-block">
                   <div class="summary-label">
                     <v-icon size="40" class="me-2">mdi-lightning-bolt-outline</v-icon>
-                    Feature Set
+                    {{ $t("info.features") }}
                   </div>
                   <div class="summary-value ml-2">
-                    {{ hasFeatures ? `${details.features.length} capabilities` : 'No features reported' }}
+                    {{ hasFeatures ? `${details.features.length} ${$t("info.capabilities")}` : $t("info.noFeaturesReported") }}
                   </div>
 
                   <div class="summary-chips">
@@ -59,12 +55,12 @@
                       </v-chip>
                       <v-chip v-if="details.features.length > featurePreview.length"
                         class="summary-chip summary-chip--more" size="small" variant="outlined">
-                        +{{ details.features.length - featurePreview.length }} more
+                        +{{ details.features.length - featurePreview.length }} {{ $t("info.more") }}
                       </v-chip>
                     </template>
                     <div v-else class="summary-empty">
                       <v-icon size="16">mdi-eye-off-outline</v-icon>
-                      <span>No optional capabilities.</span>
+                      <span>{{ $t("info.empty") }}</span>
                     </div>
                   </div>
                 </div>
@@ -98,7 +94,7 @@
       </v-card>
     </div>
     <div v-else key="device-info-empty" class="device-info-empty">
-      <DisconnectedState subtitle="Connect to an ESP32 to see device information." />
+      <DisconnectedState :subtitle="$t('info.disconnectState')" />
     </div>
   </Transition>
 </template>
