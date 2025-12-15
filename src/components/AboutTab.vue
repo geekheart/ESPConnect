@@ -18,7 +18,6 @@
     <v-card variant="tonal" class="mb-4">
       <v-card-title class="text-subtitle-1">
         <v-icon start color="primary">mdi-folder-star-multiple</v-icon>
-        Filesystem Tools
         {{ $t("about[1].title") }}
       </v-card-title>
       <v-card-text class="text-body-2">
