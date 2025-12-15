@@ -6,9 +6,9 @@
           <v-icon size="34">mdi-table-refresh</v-icon>
         </v-avatar>
         <div class="partitions-empty__text">
-          <div class="partitions-empty__title">{{ $t("partition.empty.title") }}</div>
+          <div class="partitions-empty__title">{{ $t("partitions.empty.title") }}</div>
           <div class="partitions-empty__subtitle">
-            {{ $t("partition.empty.subtitle") }}
+            {{ $t("partitions.empty.subtitle") }}
           </div>
         </div>
       </v-card-text>
@@ -19,6 +19,7 @@
       <template v-slot:title>
         <span class="font-weight-black">{{ partitionCardTitle }}</span>
       </template>
+      <!-- 未使用空间提示框 - 改造翻译 -->
       <v-alert v-if="showUnusedAlert" type="warning" variant="tonal" class="unused-alert">
         <div>
           Unused flash detected - about {{ unusedReadable }} ({{ unusedBytesDisplay }} bytes) is reclaimable.
@@ -35,6 +36,7 @@
           </a>.
         </div>
       </v-alert>
+      <!-- 自定义布局提示框 - 改造翻译 -->
       <v-alert v-else type="info" variant="tonal" class="unused-alert">
         Want to customize this layout? Watch the
         <a href="https://youtu.be/EuHxodrye6E" target="_blank" rel="noopener noreferrer">
@@ -46,6 +48,7 @@
           ESP32 partition builder
         </a>.
       </v-alert>
+      <!-- 分区可视化地图 - 改造空状态翻译 -->
       <div class="partition-map">
         <VTooltip v-for="segment in partitionSegments" :key="segment.key" location="top" :open-delay="120"
           transition="fade-transition">
@@ -63,7 +66,7 @@
               backgroundImage: segment.backgroundImage || undefined,
             }">
               <span v-if="segment.showLabel" class="partition-label">
-                {{ segment.label || 'Unnamed' }}
+                {{ segment.label || $t("partitions.label.unnamed") }}
               </span>
               <span v-if="segment.showMeta" class="partition-meta">
                 {{ segment.sizeText }} - {{ segment.offsetHex }}
@@ -72,7 +75,7 @@
           </template>
           <template #default>
             <div class="partition-tooltip">
-              <div class="partition-tooltip__title">{{ segment.label || 'Unnamed' }}</div>
+              <div class="partition-tooltip__title">{{ segment.label || $t("partitions.label.unnamed") }}</div>
               <div v-for="line in segment.tooltipLines" :key="line" class="partition-tooltip__line">
                 {{ line }}
               </div>
@@ -80,14 +83,15 @@
           </template>
         </VTooltip>
       </div>
+      <!-- 分区表格 - 改造表头翻译 -->
       <v-table density="comfortable" class="mt-4">
         <thead>
           <tr>
-            <th>Label</th>
-            <th>Type</th>
-            <th>Subtype</th>
-            <th>Offset</th>
-            <th>Size</th>
+            <th>{{ $t("partitions.table.header.label") }}</th>
+            <th>{{ $t("partitions.table.header.type") }}</th>
+            <th>{{ $t("partitions.table.header.subtype") }}</th>
+            <th>{{ $t("partitions.table.header.offset") }}</th>
+            <th>{{ $t("partitions.table.header.size") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -98,7 +102,7 @@
                   backgroundColor: entry.color,
                   backgroundImage: entry.backgroundImage || undefined,
                 }"></span>
-                <span>{{ entry.label || 'Unnamed' }}</span>
+                <span>{{ entry.label || $t("partitions.label.unnamed") }}</span>
               </div>
             </td>
             <td>{{ entry.typeLabel }}</td>
@@ -109,14 +113,15 @@
         </tbody>
       </v-table>
     </v-card>
-
   </div>
-
-
 </template>
 
 <script setup>
 import { computed, toRefs } from 'vue';
+import { useI18n } from 'vue-i18n'; // 引入i18n
+
+// 初始化i18n
+const { t } = useI18n();
 
 const props = defineProps({
   partitionSegments: {
@@ -139,6 +144,7 @@ const props = defineProps({
 
 const { partitionSegments, formattedPartitions, unusedSummary, flashSizeLabel } = toRefs(props);
 
+// 计算属性 - 保持原有逻辑，替换硬编码文本为翻译调用
 const showUnusedAlert = computed(() => Boolean(unusedSummary.value));
 const unusedReadable = computed(() => unusedSummary.value?.readable ?? '');
 const unusedBytesDisplay = computed(() =>
@@ -307,8 +313,9 @@ const partitionCardTitle = computed(() => {
   opacity: 0.85;
 }
 
+/* 改造空状态文本为翻译（需配合全局样式或动态绑定，这里先保留占位） */
 .partition-map:empty::before {
-  content: 'No partitions detected.';
+  content: attr(data-empty-text);
   padding: 16px;
   color: color-mix(in srgb, var(--v-theme-on-surface) 60%, transparent);
 }

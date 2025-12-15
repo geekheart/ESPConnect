@@ -24,7 +24,7 @@
 
     <div v-if="loading" class="apps-tab__loading">
       <v-progress-circular indeterminate color="primary" size="28" />
-      <span class="ms-3 text-body-2">Reading application metadata…</span>
+      <span class="ms-3 text-body-2">{{ $t("appsTab.loadingText") }}</span>
     </div>
 
     <template v-else>
@@ -35,7 +35,7 @@
         density="comfortable"
         border="start"
       >
-        No application partitions detected.
+        {{ $t("appsTab.noPartitions") }}
       </v-alert>
 
       <div v-else class="apps-tab__list">
@@ -47,55 +47,55 @@
             </div>
             <div class="apps-tab__chips">
               <v-chip v-if="app.isActive" color="success" size="small" variant="elevated">
-                Active
+                {{ $t("appsTab.chips.active") }}
               </v-chip>
               <v-chip v-if="!app.valid" color="warning" size="small" variant="outlined">
-                Encrypted/Invalid
+                {{ $t("appsTab.chips.encryptedInvalid") }}
               </v-chip>
             </div>
           </v-card-title>
           <v-card-subtitle class="apps-tab__subtitle">
-            Offset {{ app.offsetHex }} • Size {{ app.sizeText }}
+            {{ $t("appsTab.subtitle", { offset: app.offsetHex, size: app.sizeText }) }}
           </v-card-subtitle>
           <v-card-text>
             <template v-if="app.valid">
               <div class="apps-tab__details">
                 <div class="apps-tab__detail">
-                  <span class="apps-tab__label">Project</span>
+                  <span class="apps-tab__label">{{ $t("appsTab.details.project") }}</span>
                   <span class="apps-tab__value">{{ app.projectName || '—' }}</span>
                 </div>
                 <div class="apps-tab__detail">
-                  <span class="apps-tab__label">Version</span>
+                  <span class="apps-tab__label">{{ $t("appsTab.details.version") }}</span>
                   <span class="apps-tab__value">{{ app.version || '—' }}</span>
                 </div>
                 <div class="apps-tab__detail">
-                  <span class="apps-tab__label">Built</span>
+                  <span class="apps-tab__label">{{ $t("appsTab.details.built") }}</span>
                   <span class="apps-tab__value">
                     {{ app.built || [app.buildDate, app.buildTime].filter(Boolean).join(' ') || '—' }}
                   </span>
                 </div>
                 <div class="apps-tab__detail">
-                  <span class="apps-tab__label">IDF / Core</span>
+                  <span class="apps-tab__label">{{ $t("appsTab.details.idfCore") }}</span>
                   <span class="apps-tab__value">{{ app.idfVersion || '—' }}</span>
                 </div>
                 <div class="apps-tab__detail">
-                  <span class="apps-tab__label">Entry address</span>
+                  <span class="apps-tab__label">{{ $t("appsTab.details.entryAddress") }}</span>
                   <span class="apps-tab__value">{{ app.entryAddressHex || '—' }}</span>
                 </div>
                 <div class="apps-tab__detail">
-                  <span class="apps-tab__label">Segments</span>
+                  <span class="apps-tab__label">{{ $t("appsTab.details.segments") }}</span>
                   <span class="apps-tab__value">
                     {{ app.segmentCount != null ? app.segmentCount : '—' }}
                   </span>
                 </div>
               </div>
               <div v-if="!app.descriptorFound" class="text-caption text-medium-emphasis mt-2">
-                Application descriptor not found in first 64 KB.
+                {{ $t("appsTab.descriptorNotFound") }}
               </div>
             </template>
             <template v-else>
               <v-alert type="warning" variant="tonal" density="comfortable" border="start">
-                {{ app.error || 'Encrypted or invalid image header.' }}
+                {{ app.error || $t("appsTab.invalidImageHeader") }}
               </v-alert>
             </template>
           </v-card-text>
@@ -106,6 +106,11 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'; // 引入i18n
+
+// 初始化i18n
+const { t } = useI18n();
+
 defineProps({
   apps: {
     type: Array,

@@ -70,7 +70,9 @@
     "emptyStateMessage": "No LittleFS files found. Read the partition or upload to begin.",
     "backupDialog": "Preparing backup...",
     "saveDialog": "Writing LittleFS image...",
-    "restoreDialog": "Restoring LittleFS image..."
+    "restoreDialog": "Restoring LittleFS image...",
+    "backupDialogTitle": "LittleFS Backup",
+    "loadingLittleFS": "Loading LittleFS"
   },
   "fatfs": {
     "disconnectState": "Connect to an ESP32 with a FATFS partition to use these tools.",
@@ -160,5 +162,164 @@
       "title": "No partition data yet",
       "subtitle": "Connect to an ESP32 to load its partition table."
     }
+  },
+  "fsManager": {
+    "read": "Read",
+    "backup": "Backup",
+    "restore": "Restore Image",
+    "format": "Download",
+    "save": "Save to Flash",
+    "backupDone": "Download a backup image first (use the \"Backup\" button once per session). \"Save to Flash\"becomes available after any successful backup made during this connection.",
+    "backupAlert": "Changes are staged locally until you click “Save to Flash”. A recent backup ensures you can recover if something goes wrong.",
+    "unsave": "Unsave changes",
+    "used": "Used",
+    "free": "Free",
+    "upload": "Upload",
+    "drop": "Drop files to add"
+  },
+  "partitions": {
+    "empty": {
+      "title": "No Partitions",
+      "subtitle": "Connect a device and refresh to load partition information"
+    },
+    "alert": {
+      "customize": {
+        "layout": "Want to customize this layout?"
+      }
+    },
+    "card": {
+      "title": {
+        "base": "Partitions",
+        "prefix": "Partitions · "
+      }
+    },
+    "table": {
+      "header": {
+        "label": "Label",
+        "type": "Type",
+        "subtype": "Subtype",
+        "offset": "Offset",
+        "size": "Size"
+      }
+    },
+    "label": {
+      "unnamed": "Unnamed"
+    },
+    "link": {
+      "tutorial": "partition tutorial",
+      "builder": "ESP32 partition builder"
+    },
+    "map": {
+      "empty": "No partitions detected."
+    }
+  },
+  "firmwareTools": {
+    "warning": {
+      "advancedUser": "Firmware tools are intended for advanced users. Writing or erasing flash can permanently remove data or render the microcontroller unbootable. Double-check settings before proceeding."
+    },
+    "common": {
+      "partition": "Partition",
+      "startOffset": "Start offset",
+      "lengthBytes": "Length (bytes)",
+      "flashOffset": "Flash offset",
+      "stop": "Stop"
+    },
+    "backupErase": {
+      "title": "Flash Backup & Erase",
+      "downloadSelected": "Download Selected Partition",
+      "downloadAll": "Download All Partitions",
+      "downloadUsed": "Download Used Flash",
+      "downloadRegion": "Download Flash Region",
+      "eraseEntire": "Erase Entire Flash"
+    },
+    "firmwareFlash": {
+      "title": "Flash Firmware",
+      "firmwareBinary": "Firmware binary (.bin)",
+      "recommendedOffsets": "Recommended offsets",
+      "eraseBeforeWrite": "Erase entire flash before writing",
+      "baudHint": "Flashing runs at {defaultBaud} bps by default. Drop the baud if the device struggles to sync. The serial monitor automatically switches to {monitorBaud} bps for stability.",
+      "flashFirmware": "Flash Firmware"
+    },
+    "registerAccess": {
+      "title": "Register Access",
+      "quickSelect": "Quick-select register",
+      "registerAddress": "Register address",
+      "value": "Value",
+      "readRegister": "Read Register",
+      "writeRegister": "Write Register",
+      "viewReference": "View register reference",
+      "openTechnicalRef": "Open technical reference",
+      "lastReadValue": "Last read value"
+    },
+    "flashIntegrity": {
+      "title": "Flash Integrity",
+      "partitionAutoFill": "Selecting a partition will auto-fill the offset and length fields below.",
+      "computeMD5": "Compute MD5",
+      "md5Checksum": "MD5 checksum"
+    },
+    "dialogs": {
+      "flashInProgress": {
+        "title": "Flash in progress",
+        "preparing": "Preparing flash..."
+      },
+      "downloadInProgress": {
+        "title": "Flash download in progress",
+        "preparing": "Preparing download..."
+      }
+    }
+  },
+  "serialMonitor": {
+    "title": "Serial Monitor",
+    "status": {
+      "live": "Live",
+      "stopped": "Stopped"
+    },
+    "buttons": {
+      "start": "Start",
+      "stop": "Stop",
+      "clear": "Clear",
+      "reset": "Reset"
+    },
+    "filter": {
+      "placeholder": "Filter output"
+    },
+    "subtitle": "Console run at 115200 bps automatically for reliable output. Flashing uses the baud rate selected in the toolbar.",
+    "info": {
+      "alert": "Starting the serial monitor closes the bootloader connection, resets the board into normal firmware mode, and releases the USB port so the browser stops access once you exit. Reconnect with the main \"Connect\" button before running maintenance (flash, partition tools, etc.)."
+    },
+    "terminal": {
+      "empty": "Monitor output will appear here once started."
+    }
+  },
+  "sessionLog": {
+    "title": "Session Log",
+    "buttons": {
+      "copy": "Copy",
+      "clear": "Clear"
+    },
+    "emptyText": "Logs will appear here once actions begin.",
+    "copy": {
+      "success": "Session log copied to clipboard.",
+      "error": "Unable to copy log. Please try again."
+    }
+  },
+  "appsTab": {
+    "loadingText": "Reading application metadata…",
+    "noPartitions": "No application partitions detected.",
+    "subtitle": "Offset {offset} • Size {size}",
+    "chips": {
+      "active": "Active",
+      "encryptedInvalid": "Encrypted/Invalid"
+    },
+    "details": {
+      "project": "Project",
+      "version": "Version",
+      "built": "Built",
+      "idfCore": "IDF / Core",
+      "entryAddress": "Entry address",
+      "segments": "Segments"
+    },
+    "descriptorNotFound": "Application descriptor not found in first 64 KB.",
+    "invalidImageHeader": "Encrypted or invalid image header."
   }
 }

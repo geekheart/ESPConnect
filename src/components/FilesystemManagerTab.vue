@@ -20,38 +20,36 @@
           <v-btn color="primary" variant="tonal" :disabled="!hasPartition || loading || busy || saving"
             @click="emit('refresh')">
             <v-icon start>mdi-refresh</v-icon>
-            Read
+            {{ $t("fsManager.read") }}
           </v-btn>
           <v-btn color="secondary" variant="outlined" :disabled="!hasPartition || loading || busy || saving"
             @click="emit('backup')">
             <v-icon start>mdi-content-save</v-icon>
-            Backup
+            {{ $t("fsManager.backup") }}
           </v-btn>
           <v-btn color="secondary" variant="text" :disabled="!hasPartition || loading || busy || saving"
             @click="triggerRestore">
             <v-icon start>mdi-upload</v-icon>
-            Restore Image
+            {{ $t("fsManager.restore") }}
           </v-btn>
           <v-btn color="error" variant="text"
             :disabled="readOnly || !hasClient || loading || busy || saving || !backupDone" @click="emit('format')">
             <v-icon start>mdi-delete-sweep</v-icon>
-            Format
+            {{ $t("fsManager.format") }}
           </v-btn>
           <v-spacer />
           <v-btn color="primary" variant="elevated"
             :disabled="readOnly || !dirty || !backupDone || saving || loading || busy || !hasClient"
             @click="emit('save')">
             <v-icon start>mdi-content-save-outline</v-icon>
-            Save to Flash
+            {{ $t("fsManager.save") }}
           </v-btn>
         </div>
         <v-alert v-if="!backupDone" type="warning" variant="tonal" density="comfortable" border="start" class="mt-2">
-          Download a backup image first (use the "Backup" button once per session). "Save to Flash"
-          becomes available after any successful backup made during this connection.
+          {{ $t("fsManager.backDone") }}
         </v-alert>
         <p class="text-caption text-medium-emphasis mb-0">
-          Changes are staged locally until you click “Save to Flash”. A recent backup ensures you can
-          recover if something goes wrong.
+          {{ $t("fsManager.backupAlert") }}
         </p>
       </v-card-text>
     </v-card>
@@ -65,19 +63,19 @@
       <v-card-title class="d-flex align-center justify-space-between">
         <span>Files</span>
         <v-chip v-if="dirty" color="warning" size="large" variant="tonal">
-          Unsaved changes
+          {{ $t("fsManager.unsave") }}
         </v-chip>
       </v-card-title>
       <v-card-text>
         <div v-if="usage?.capacityBytes" class="filesystem-usage">
           <div class="">
-            <span>Used {{ usagePercent }}% ({{ formatSize(usage.usedBytes) }} / {{ formatSize(usage.capacityBytes)
+            <span>{{ $t("fsManager.used") }} {{ usagePercent }}% ({{ formatSize(usage.usedBytes) }} / {{ formatSize(usage.capacityBytes)
             }})</span>
             <span></span>
           </div>
           <v-progress-linear :model-value="usagePercent" height="15" rounded color="primary" />
           <div class="text-caption text-medium-emphasis">
-            Free {{ formatSize(usage.freeBytes) }}
+            {{ $t("fsManager.free") }} {{ formatSize(usage.freeBytes) }}
           </div>
         </div>
         <div>
@@ -95,7 +93,7 @@
                   :disabled="readOnly || !uploadFile || !hasClient || loading || busy || saving || uploadBlocked"
                   @click="submitUpload">
                   <v-icon start>mdi-upload</v-icon>
-                  Upload
+                  {{ $t("fsManager.upload") }}
                 </v-btn>
               </div>
             </v-col>
@@ -104,7 +102,7 @@
                 <div class="filesystem-dropzone__hint">
                   <v-icon size="32">mdi-cloud-upload-outline</v-icon>
                   <div class="filesystem-dropzone__hint-text">
-                    <strong>Drop files to add</strong>
+                    <strong>{{$t("fsManager.drop")}}</strong>
                   </div>
                 </div>
               </div>

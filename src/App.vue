@@ -97,12 +97,10 @@
       <v-container fluid>
         <v-card elevation="8" class="pa-6">
           <v-alert v-if="!serialSupported" type="error" class="mb-4" variant="tonal" icon="mdi-alert-circle-outline">
-            This browser does not support the Web Serial API. Use Chrome, Edge, or another Chromium-based browser.
             {{ $t('alerts.webSerialNotSupported') }}
           </v-alert>
           <v-alert v-else-if="showSerialMonitorReconnectNotice" type="info" class="mb-4" variant="tonal"
             icon="mdi-console-line">
-            Serial monitor closed — click Connect to re-enter maintenance mode.
             {{ $t('alerts.serialMonitorReconnectNotice') }}
           </v-alert>
           <v-window v-model="activeTab" class="app-tab-content">
@@ -211,7 +209,7 @@
                 @erase-flash="handleEraseFlash" @cancel-download="handleCancelDownload"
                 @select-register="handleSelectRegister" />
               <DisconnectedState v-else icon="mdi-chip" :min-height="420"
-                :subtitle="$('flash.disconnectState')" />
+                :subtitle="$t('flash.disconnectState')" />
             </v-window-item>
             <v-window-item value="console">
               <SerialMonitorTab :monitor-text="monitorText" :monitor-active="monitorActive"
@@ -279,7 +277,7 @@
           <v-card>
             <v-card-title class="text-h6">
               <v-icon start color="primary">mdi-content-save</v-icon>
-              LittleFS Backup
+              {{$t('littlefs.backupDialogTitle')}}
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
@@ -302,7 +300,7 @@
           <v-card>
             <v-card-title class="text-h6">
               <v-icon start color="primary">mdi-folder-sync</v-icon>
-              Loading LittleFS
+              {{ $t('littlefs.loadingLittleFS') }}
             </v-card-title>
             <v-card-text class="progress-dialog__body">
               <div class="progress-dialog__label">
